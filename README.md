@@ -36,3 +36,6 @@ This is an OAuth Microservice that takes a lot of the work out of setting up an 
         "sid": "other gibberish",
         "updated_at": "2024-08-06T03:02:31.139Z",
     }
+
+# UML Sequence Diagram
+![image](https://github.com/user-attachments/assets/d3ba4eb1-3ce4-4af5-af53-0144c127f170)
