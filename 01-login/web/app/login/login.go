@@ -27,7 +27,7 @@ func Handler(auth *authenticator.Authenticator) gin.HandlerFunc {
 		auth.Config.RedirectURL = callbackURL
 
 
-		// State Checks.
+		// I'm using session states to keep request parameters beyond the redirect to the OAuth Service.
 		session := sessions.Default(ctx)
 		session.Set("state", state)
 		userCallback := ctx.Query("user_callback")
@@ -42,21 +42,7 @@ func Handler(auth *authenticator.Authenticator) gin.HandlerFunc {
 		session.Set("data_callback", dataCallback)
 
 		if dataCallback == "debug" {
-			profile := map[string]interface{}{
-				"aud": "kgijA1KuOdr0XQszhTgsYEScLRheKRSJ",
-				"exp": 1723024604,
-				"family_name": "Norman",
-				"given_name": "Matthew",
-				"iat": 1722988604,
-				"iss": "https://secure361login.us.auth0.com/",
-				"key": "google-oauth2|104449841002335188382",
-				"name": "Matthew Norman",
-				"nickname": "mrnorman.sev",
-				"picture": "https://lh3.googleusercontent.com/a/ACg8ocLTpCaxxzFgPZfI5utdAnAev-lJ5FEnxJ5uLfHZ67AydeoePQ=s96-c",
-				"sid": "IlspzRKyaa1irbLW_RWQIQM5Tt_ue9US",
-				"updated_at": "2024-08-06T03:02:31.139Z",
-			}
-			ctx.JSON(http.StatusOK, profile)
+			ctx.JSON(http.StatusOK, getDebugProfile())
 			return
 		}
 
@@ -79,4 +65,21 @@ func generateRandomState() (string, error) {
 	state := base64.StdEncoding.EncodeToString(b)
 
 	return state, nil
+}
+
+func getDebugProfile() (map[string]interface{}) {
+	return map[string]interface{}{
+		"aud": "kgijA1KuOdr0XQszhTgsYEScLRheKRSJ",
+		"exp": 1723024604,
+		"family_name": "Norman",
+		"given_name": "Matthew",
+		"iat": 1722988604,
+		"iss": "https://secure361login.us.auth0.com/",
+		"key": "google-oauth2|104449841002335188382",
+		"name": "Matthew Norman",
+		"nickname": "mrnorman.sev",
+		"picture": "https://lh3.googleusercontent.com/a/ACg8ocLTpCaxxzFgPZfI5utdAnAev-lJ5FEnxJ5uLfHZ67AydeoePQ=s96-c",
+		"sid": "IlspzRKyaa1irbLW_RWQIQM5Tt_ue9US",
+		"updated_at": "2024-08-06T03:02:31.139Z",
+	}
 }
