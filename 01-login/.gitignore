@@ -1,0 +1,6 @@
+.env
+.DS_Store
+src/
+pkg/
+Dockerfile
+key.json

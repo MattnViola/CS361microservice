@@ -13,6 +13,7 @@ import (
 	"01-Login/web/app/login"
 	"01-Login/web/app/logout"
 	"01-Login/web/app/user"
+	"01-Login/web/app/userdata"
 )
 
 // New registers the routes and returns the router.
@@ -33,6 +34,7 @@ func New(auth *authenticator.Authenticator) *gin.Engine {
 	router.GET("/callback", callback.Handler(auth))
 	router.GET("/user", middleware.IsAuthenticated, user.Handler)
 	router.GET("/logout", logout.Handler)
+	router.POST("/userdata", userdata.Handler)
 
 	return router
 }

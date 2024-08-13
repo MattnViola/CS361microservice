@@ -1,15 +1,14 @@
 package callback
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 
 	"01-Login/platform/authenticator"
+	"01-Login/platform/storage"
 )
 
 // Handler for our callback.
@@ -49,12 +48,13 @@ func Handler(auth *authenticator.Authenticator) gin.HandlerFunc {
 		}
 
 		if sub, exists := profile["sub"]; exists {
-			profile["key"] = sub
+			parts := strings.Split(sub.(string), "|")
+			profile["key"] = parts[1]
 			delete(profile, "sub")
 		}
 		
 
-		
+		storage.UploadJSON("cs361microservicedata", profile["key"].(string), profile)
 
 		// Sends a post to the data callback, and redirects the user to the usercallback.
 		userCallback, ok := session.Get("user_callback").(string)
@@ -63,28 +63,21 @@ func Handler(auth *authenticator.Authenticator) gin.HandlerFunc {
 			return
 		}
 
-		dataCallback, ok := session.Get("data_callback").(string)
-		if !ok {
-			ctx.String(http.StatusInternalServerError, "Failed to retrieve data_callback from session.")
-			return
-		}
+		// dataCallback, ok := session.Get("data_callback").(string)
+		// if !ok {
+		// 	ctx.String(http.StatusInternalServerError, "Failed to retrieve data_callback from session.")
+		// 	return
+		// }
 
 		// Clearing session here to get around problems of previous states.
 		deleteSessionInfo(session)
 
 		userCallback += "&key=" + profile["key"].(string)
-		profileData, err := json.Marshal(profile)
-        if err != nil {
-            ctx.String(http.StatusInternalServerError, "Failed to marshal profile data.")
-            return
-        }
-
-        _, err = http.Post(dataCallback, "application/json", bytes.NewBuffer(profileData))
-        if err != nil {
-			fmt.Println("Error sending POST request to data_callback URL:", err)
-            ctx.String(http.StatusInternalServerError, "Failed to send POST request to data_callback URL.")
-            return
-        }
+		// profileData, err := json.Marshal(profile)
+        // if err != nil {
+        //     ctx.String(http.StatusInternalServerError, "Failed to marshal profile data.")
+        //     return
+        // }
 
         ctx.Redirect(http.StatusFound, userCallback)
 	}
@@ -92,6 +85,6 @@ func Handler(auth *authenticator.Authenticator) gin.HandlerFunc {
 
 func deleteSessionInfo(session sessions.Session) {
 	session.Delete("user_callback")
-	session.Delete("data_callback")
+	// session.Delete("data_callback")
 	session.Delete("state")
 }

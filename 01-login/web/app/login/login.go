@@ -31,21 +31,13 @@ func Handler(auth *authenticator.Authenticator) gin.HandlerFunc {
 		session := sessions.Default(ctx)
 		session.Set("state", state)
 		userCallback := ctx.Query("user_callback")
-        dataCallback := ctx.Query("data_callback")
 
-        if userCallback == "" || dataCallback == "" {
-            ctx.JSON(http.StatusBadRequest, gin.H{"error": "user_callback and data_callback are required"})
+        if userCallback == "" {
+            ctx.JSON(http.StatusBadRequest, gin.H{"error": "user_callback is required"})
             return
         }
 
 		session.Set("user_callback", userCallback)
-		session.Set("data_callback", dataCallback)
-
-		if dataCallback == "debug" {
-			ctx.JSON(http.StatusOK, getDebugProfile())
-			return
-		}
-
 		if err := session.Save(); err != nil {
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return
