@@ -63,22 +63,9 @@ func Handler(auth *authenticator.Authenticator) gin.HandlerFunc {
 			return
 		}
 
-		// dataCallback, ok := session.Get("data_callback").(string)
-		// if !ok {
-		// 	ctx.String(http.StatusInternalServerError, "Failed to retrieve data_callback from session.")
-		// 	return
-		// }
-
-		// Clearing session here to get around problems of previous states.
 		deleteSessionInfo(session)
 
 		userCallback += "&key=" + profile["key"].(string)
-		// profileData, err := json.Marshal(profile)
-        // if err != nil {
-        //     ctx.String(http.StatusInternalServerError, "Failed to marshal profile data.")
-        //     return
-        // }
-
         ctx.Redirect(http.StatusFound, userCallback)
 	}
 }
